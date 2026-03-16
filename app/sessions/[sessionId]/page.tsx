@@ -270,8 +270,9 @@ export default function SessionPage() {
       if (s.surveyQuestions && !questionsEdited) {
         setEditableQuestions(s.surveyQuestions);
       }
-    } catch {
-      router.push("/");
+    } catch (err) {
+      console.error("Failed to load session:", err);
+      setError(`Failed to load session: ${String(err)}`);
     }
   }, [sessionId, router, questionsEdited]);
 
@@ -340,7 +341,13 @@ export default function SessionPage() {
   if (!session) {
     return (
       <div className="flex items-center justify-center h-64">
-        <Spinner />
+        {error ? (
+          <div className="text-red-600 text-sm p-4 bg-red-50 rounded-xl border border-red-100 max-w-lg">
+            {error}
+          </div>
+        ) : (
+          <Spinner />
+        )}
       </div>
     );
   }
