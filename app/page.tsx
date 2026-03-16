@@ -29,8 +29,8 @@ function phaseColor(phase: Session["phase"]) {
   return "bg-gray-100 text-gray-600";
 }
 
-export default function HomePage() {
-  const sessions = listSessions();
+export default async function HomePage() {
+  const sessions = await listSessions();
 
   return (
     <div className="space-y-16">
