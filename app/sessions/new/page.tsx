@@ -246,11 +246,20 @@ export default function NewSessionPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ brief }),
       });
-      if (!res.ok) throw new Error("Failed to create session");
-      const session = await res.json();
-      router.push(`/sessions/${session.id}`);
-    } catch {
-      setError("Something went wrong. Please try again.");
+      const data = await res.json();
+      if (!res.ok) {
+        setError(`Error ${res.status}: ${data.detail || data.error || "Failed to create session"}`);
+        setLoading(false);
+        return;
+      }
+      if (!data.id) {
+        setError("Session created but missing ID. Check server logs.");
+        setLoading(false);
+        return;
+      }
+      router.push(`/sessions/${data.id}`);
+    } catch (err) {
+      setError(`Something went wrong: ${String(err)}`);
       setLoading(false);
     }
   };
