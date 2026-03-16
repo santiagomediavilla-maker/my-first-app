@@ -4,6 +4,8 @@ import { anthropic, MODELS } from "@/lib/claude";
 import { buildEnrichBriefPrompt } from "@/lib/prompts";
 import { BusinessIdeaBrief } from "@/types";
 
+export const maxDuration = 120;
+
 export async function POST(
   _request: Request,
   { params }: { params: Promise<{ sessionId: string }> }
@@ -31,9 +33,10 @@ export async function POST(
       enriched = JSON.parse(jsonStr) as BusinessIdeaBrief;
       enriched.enrichedAt = new Date().toISOString();
       break;
-    } catch {
+    } catch (err) {
+      console.error(`enrich-brief attempt ${attempt + 1} failed:`, err);
       if (attempt === 2) {
-        return NextResponse.json({ error: "Failed to enrich brief" }, { status: 500 });
+        return NextResponse.json({ error: "Failed to enrich brief", detail: String(err) }, { status: 500 });
       }
     }
   }
