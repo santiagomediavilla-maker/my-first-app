@@ -1,13 +1,15 @@
 import { createClient } from "@supabase/supabase-js";
 import { Session } from "@/types";
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_ANON_KEY!
-);
+function getClient() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_ANON_KEY!
+  );
+}
 
 export async function readSession(id: string): Promise<Session | null> {
-  const { data, error } = await supabase
+  const { data, error } = await getClient()
     .from("sessions")
     .select("data")
     .eq("id", id)
@@ -18,13 +20,13 @@ export async function readSession(id: string): Promise<Session | null> {
 }
 
 export async function writeSession(session: Session): Promise<void> {
-  await supabase
+  await getClient()
     .from("sessions")
     .upsert({ id: session.id, data: session });
 }
 
 export async function listSessions(): Promise<Session[]> {
-  const { data, error } = await supabase
+  const { data, error } = await getClient()
     .from("sessions")
     .select("data")
     .order("created_at", { ascending: false });
