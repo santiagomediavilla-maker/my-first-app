@@ -1,36 +1,34 @@
-import fs from "fs";
-import path from "path";
+import { createClient } from "@supabase/supabase-js";
 import { Session } from "@/types";
 
-const DATA_DIR = path.join(process.cwd(), "data", "sessions");
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_ANON_KEY!
+);
 
-function ensureDataDir() {
-  if (!fs.existsSync(DATA_DIR)) {
-    fs.mkdirSync(DATA_DIR, { recursive: true });
-  }
+export async function readSession(id: string): Promise<Session | null> {
+  const { data, error } = await supabase
+    .from("sessions")
+    .select("data")
+    .eq("id", id)
+    .single();
+
+  if (error || !data) return null;
+  return data.data as Session;
 }
 
-export function readSession(id: string): Session | null {
-  ensureDataDir();
-  const filePath = path.join(DATA_DIR, `${id}.json`);
-  if (!fs.existsSync(filePath)) return null;
-  const raw = fs.readFileSync(filePath, "utf-8");
-  return JSON.parse(raw) as Session;
+export async function writeSession(session: Session): Promise<void> {
+  await supabase
+    .from("sessions")
+    .upsert({ id: session.id, data: session });
 }
 
-export function writeSession(session: Session): void {
-  ensureDataDir();
-  const filePath = path.join(DATA_DIR, `${session.id}.json`);
-  fs.writeFileSync(filePath, JSON.stringify(session, null, 2), "utf-8");
-}
+export async function listSessions(): Promise<Session[]> {
+  const { data, error } = await supabase
+    .from("sessions")
+    .select("data")
+    .order("created_at", { ascending: false });
 
-export function listSessions(): Session[] {
-  ensureDataDir();
-  const files = fs.readdirSync(DATA_DIR).filter((f) => f.endsWith(".json"));
-  return files
-    .map((f) => {
-      const raw = fs.readFileSync(path.join(DATA_DIR, f), "utf-8");
-      return JSON.parse(raw) as Session;
-    })
-    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  if (error || !data) return [];
+  return data.map((row) => row.data as Session);
 }

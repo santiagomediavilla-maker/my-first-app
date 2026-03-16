@@ -8,7 +8,7 @@ export async function POST(
   { params }: { params: Promise<{ sessionId: string }> }
 ) {
   const { sessionId } = await params;
-  const session = readSession(sessionId);
+  const session = await readSession(sessionId);
   if (!session || !session.brief) {
     return NextResponse.json({ error: "Session not found or missing brief" }, { status: 404 });
   }
@@ -33,7 +33,7 @@ export async function POST(
         surveyQuestions: questions,
         updatedAt: new Date().toISOString(),
       };
-      writeSession(updated);
+      await writeSession(updated);
       return NextResponse.json(updated);
     } catch {
       if (attempt === 2) {

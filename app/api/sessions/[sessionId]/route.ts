@@ -6,7 +6,7 @@ export async function GET(
   { params }: { params: Promise<{ sessionId: string }> }
 ) {
   const { sessionId } = await params;
-  const session = readSession(sessionId);
+  const session = await readSession(sessionId);
   if (!session) {
     return NextResponse.json({ error: "Session not found" }, { status: 404 });
   }
@@ -18,7 +18,7 @@ export async function PATCH(
   { params }: { params: Promise<{ sessionId: string }> }
 ) {
   const { sessionId } = await params;
-  const session = readSession(sessionId);
+  const session = await readSession(sessionId);
   if (!session) {
     return NextResponse.json({ error: "Session not found" }, { status: 404 });
   }
@@ -29,6 +29,6 @@ export async function PATCH(
     ...updates,
     updatedAt: new Date().toISOString(),
   };
-  writeSession(updated);
+  await writeSession(updated);
   return NextResponse.json(updated);
 }

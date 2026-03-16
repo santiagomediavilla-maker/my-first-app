@@ -9,7 +9,7 @@ export async function POST(
   { params }: { params: Promise<{ sessionId: string }> }
 ) {
   const { sessionId } = await params;
-  const session = readSession(sessionId);
+  const session = await readSession(sessionId);
 
   if (
     !session ||
@@ -54,7 +54,7 @@ export async function POST(
         phase: "synthesis" as const,
         updatedAt: new Date().toISOString(),
       };
-      writeSession(updated);
+      await writeSession(updated);
       return NextResponse.json(updated);
     } catch {
       if (attempt === 2) {

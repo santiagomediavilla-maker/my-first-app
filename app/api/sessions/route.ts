@@ -5,7 +5,7 @@ import { Session, BusinessIdeaBrief } from "@/types";
 
 export async function GET() {
   try {
-    const sessions = listSessions();
+    const sessions = await listSessions();
     return NextResponse.json(sessions);
   } catch {
     return NextResponse.json({ error: "Failed to list sessions" }, { status: 500 });
@@ -30,7 +30,7 @@ export async function POST(request: Request) {
       brief: brief as BusinessIdeaBrief,
     };
 
-    writeSession(session);
+    await writeSession(session);
     return NextResponse.json(session, { status: 201 });
   } catch {
     return NextResponse.json({ error: "Failed to create session" }, { status: 500 });

@@ -9,7 +9,7 @@ export async function POST(
   { params }: { params: Promise<{ sessionId: string }> }
 ) {
   const { sessionId } = await params;
-  const session = readSession(sessionId);
+  const session = await readSession(sessionId);
   if (!session) {
     return NextResponse.json({ error: "Session not found" }, { status: 404 });
   }
@@ -45,6 +45,6 @@ export async function POST(
     updatedAt: new Date().toISOString(),
   };
 
-  writeSession(updated);
+  await writeSession(updated);
   return NextResponse.json(updated);
 }

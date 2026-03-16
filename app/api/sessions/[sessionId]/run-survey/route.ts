@@ -10,7 +10,7 @@ export async function POST(
   { params }: { params: Promise<{ sessionId: string }> }
 ) {
   const { sessionId } = await params;
-  const session = readSession(sessionId);
+  const session = await readSession(sessionId);
   if (!session || !session.brief || !session.personas) {
     return NextResponse.json({ error: "Session not ready for survey" }, { status: 400 });
   }
@@ -90,6 +90,6 @@ export async function POST(
     updatedAt: new Date().toISOString(),
   };
 
-  writeSession(updated);
+  await writeSession(updated);
   return NextResponse.json(updated);
 }
