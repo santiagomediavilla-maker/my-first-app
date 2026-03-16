@@ -32,7 +32,8 @@ export async function POST(request: Request) {
 
     await writeSession(session);
     return NextResponse.json(session, { status: 201 });
-  } catch {
-    return NextResponse.json({ error: "Failed to create session" }, { status: 500 });
+  } catch (err) {
+    console.error("POST /api/sessions error:", err);
+    return NextResponse.json({ error: "Failed to create session", detail: String(err) }, { status: 500 });
   }
 }
