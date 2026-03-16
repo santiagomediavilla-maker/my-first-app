@@ -30,7 +30,12 @@ function phaseColor(phase: Session["phase"]) {
 }
 
 export default async function HomePage() {
-  const sessions = await listSessions();
+  let sessions: Session[] = [];
+  try {
+    sessions = await listSessions();
+  } catch (err) {
+    console.error("Failed to load sessions:", err);
+  }
 
   return (
     <div className="space-y-16">
